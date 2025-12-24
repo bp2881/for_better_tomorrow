@@ -1,0 +1,8 @@
+.env
+wellness_agent_data/*
+__pycache__/
+temp_agent/__pycache__/
+*.pyc
+.adk/
+temp_agent/temp_agent/
+temp_agent/.adk/
