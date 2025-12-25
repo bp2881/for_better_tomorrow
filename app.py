@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify
 import requests
 from flask_cors import CORS,cross_origin
 
@@ -60,4 +60,4 @@ def send_message():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port = 5001, threaded=True, non_reloader=True)
+    app.run(debug=True, port = 5001, threaded=True, use_reloader=False)
