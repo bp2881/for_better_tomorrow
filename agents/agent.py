@@ -27,44 +27,47 @@ OUTPUT RULES (STRICT):
 - Do NOT include explanations
 - Top-level key MUST be "ui_plan"
 
-REQUIRED OUTPUT FORMAT:
+REQUIRED OUTPUT FORMAT (STRICT):
 
-You MUST return JSON only.
-
-Top-level:
 {
   "ui_plan": {
-    "days": [...]
+    "workout": [
+      {
+        "day": <number starting at 1>,
+        "exercises": [
+          {
+            "name": "Exercise name",
+            "description": "Short description",
+            "duration_seconds": 600
+          }
+        ]
+      }
+    ],
+    "diet": [
+      {
+        "day": <number starting at 1>,
+        "meals": [
+          {
+            "time": "Breakfast | Lunch | Dinner | Snack",
+            "name": "Meal name",
+            "items": ["item1", "item2"],
+            "calories": <number>,
+            "protein": <number>
+          }
+        ]
+      }
+    ]
   }
 }
 
-days MUST be an array of length = programDays
-
-Each day object MUST be:
-{
-  "day": <number starting at 1>,
-  "workout": [
-    {
-      "name": "Exercise name",
-      "description": "Short description",
-      "duration": "10 min",
-      "seconds": 600
-    }
-  ],
-  "diet": [
-    {
-      "time": "Breakfast | Lunch | Dinner | Snack",
-      "name": "Meal name",
-      "items": ["item1", "item2"],
-      "calories": <number>,
-      "protein": <number>
-    }
-  ]
-}
-
-If data is missing:
-- Make reasonable assumptions
+IMPORTANT CONSTRAINTS:
+- workout.length MUST equal programDays
+- diet.length MUST equal programDays
+- Day numbers MUST be continuous starting from 1
+- duration_seconds MUST be an integer (seconds)
 - NEVER omit ui_plan
+- NEVER nest workout and diet inside a single "days" array
+- Make reasonable assumptions if data is missing
 """
 
 root_agent = Agent(
