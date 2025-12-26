@@ -1,115 +1,110 @@
 -- sql/schema.sql
--- run as the app DB owner
-BEGIN;
-
--- extension for JSONB functions if needed
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+PRAGMA foreign_keys = ON;
 
 -- Users
 CREATE TABLE IF NOT EXISTS users (
-  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-  username text UNIQUE NOT NULL,
-  email text UNIQUE,
-  age int,
-  weight_kg numeric(5,2),
-  height_cm numeric(5,2),
-  created_at timestamptz DEFAULT now()
+  id TEXT PRIMARY KEY,            -- UUID as text
+  username TEXT UNIQUE NOT NULL,
+  email TEXT UNIQUE,
+  age INTEGER,
+  weight_kg REAL,
+  height_cm REAL,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
--- Program (a user may have multiple programs/presets)
+-- Programs
 CREATE TABLE IF NOT EXISTS programs (
-  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-  user_id uuid REFERENCES users(id) ON DELETE CASCADE,
-  name text NOT NULL,
-  duration_weeks int NOT NULL DEFAULT 4,
-  daily_ex_minutes int NOT NULL DEFAULT 30,
-  equipment jsonb DEFAULT '[]'::jsonb,
-  goals jsonb DEFAULT '[]'::jsonb,
-  created_at timestamptz DEFAULT now()
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  duration_weeks INTEGER DEFAULT 4,
+  daily_ex_minutes INTEGER DEFAULT 30,
+  equipment TEXT DEFAULT '[]',     -- JSON string
+  goals TEXT DEFAULT '[]',
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Weeks (belongs to a program)
+-- Weeks
 CREATE TABLE IF NOT EXISTS weeks (
-  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-  program_id uuid REFERENCES programs(id) ON DELETE CASCADE,
-  week_number int NOT NULL,
-  created_at timestamptz DEFAULT now(),
-  UNIQUE(program_id, week_number)
+  id TEXT PRIMARY KEY,
+  program_id TEXT NOT NULL,
+  week_number INTEGER NOT NULL,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (program_id, week_number),
+  FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE CASCADE
 );
 
--- Days (belongs to a week)
+-- Days
 CREATE TABLE IF NOT EXISTS days (
-  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-  week_id uuid REFERENCES weeks(id) ON DELETE CASCADE,
-  day_number int NOT NULL,
-  completed boolean DEFAULT false,
-  minutes int DEFAULT 0,
-  calories_target int DEFAULT 0,
-  protein_grams int DEFAULT 0,
-  notes text,
-  created_at timestamptz DEFAULT now(),
-  UNIQUE(week_id, day_number)
+  id TEXT PRIMARY KEY,
+  week_id TEXT NOT NULL,
+  day_number INTEGER NOT NULL,
+  completed INTEGER DEFAULT 0,
+  minutes INTEGER DEFAULT 0,
+  calories_target INTEGER DEFAULT 0,
+  protein_grams INTEGER DEFAULT 0,
+  notes TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (week_id, day_number),
+  FOREIGN KEY (week_id) REFERENCES weeks(id) ON DELETE CASCADE
 );
 
--- Exercises master list
+-- Exercises
 CREATE TABLE IF NOT EXISTS exercises (
-  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-  name text NOT NULL,
-  description text,
-  default_minutes int,
-  calories_estimate int,
-  equipment jsonb DEFAULT '[]'::jsonb,
-  created_at timestamptz DEFAULT now(),
-  UNIQUE(name)
+  id TEXT PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL,
+  description TEXT,
+  default_minutes INTEGER,
+  calories_estimate INTEGER,
+  equipment TEXT DEFAULT '[]',
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
--- Mapping: day -> exercises (ordered)
+-- Day → Exercises mapping
 CREATE TABLE IF NOT EXISTS day_exercises (
-  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-  day_id uuid REFERENCES days(id) ON DELETE CASCADE,
-  exercise_id uuid REFERENCES exercises(id) ON DELETE RESTRICT,
-  "order" int NOT NULL DEFAULT 0,
-  sets int,
-  reps text,
-  minutes int,
-  notes text
+  id TEXT PRIMARY KEY,
+  day_id TEXT NOT NULL,
+  exercise_id TEXT NOT NULL,
+  exercise_order INTEGER DEFAULT 0,
+  sets INTEGER,
+  reps TEXT,
+  minutes INTEGER,
+  notes TEXT,
+  FOREIGN KEY (day_id) REFERENCES days(id) ON DELETE CASCADE,
+  FOREIGN KEY (exercise_id) REFERENCES exercises(id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_dayex_day_order ON day_exercises(day_id, "order");
-
--- Progress snapshots (optionally store metrics over time)
+-- Progress snapshots
 CREATE TABLE IF NOT EXISTS progress_snapshots (
-  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-  user_id uuid REFERENCES users(id) ON DELETE CASCADE,
-  snapshot_at timestamptz DEFAULT now(),
-  total_days int,
-  days_completed int,
-  streak_current int, -- days
-  total_workouts int,
-  estimated_calories_burned numeric,
-  additional jsonb DEFAULT '{}'::jsonb
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  snapshot_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  total_days INTEGER,
+  days_completed INTEGER,
+  streak_current INTEGER,
+  total_workouts INTEGER,
+  estimated_calories_burned REAL,
+  additional TEXT DEFAULT '{}',
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Agents (AI agents / configs referenced by UI)
+-- Agents (model NOT stored; default handled in code)
 CREATE TABLE IF NOT EXISTS agents (
-  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-  name text NOT NULL,
-  role text,
-  description text,
-  config jsonb DEFAULT '{}'::jsonb, -- store custom overrides only
-  active boolean DEFAULT true,
-  created_at timestamptz DEFAULT now()
+  id TEXT PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL,
+  role TEXT,
+  description TEXT,
+  config TEXT DEFAULT '{}',
+  active INTEGER DEFAULT 1,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
-
--- Templates (UI templates, snippets, stored versions of index.html)
+-- UI templates
 CREATE TABLE IF NOT EXISTS ui_templates (
-  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-  name text NOT NULL,
-  content text NOT NULL,
-  metadata jsonb DEFAULT '{}'::jsonb,
-  created_at timestamptz DEFAULT now()
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  content TEXT NOT NULL,
+  metadata TEXT DEFAULT '{}',
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
-
-COMMIT;

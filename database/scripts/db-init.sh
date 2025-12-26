@@ -1,18 +1,12 @@
 #!/bin/sh
 set -eu
 
-# Make directories and initdb if needed
-SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-PROJECT_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
+PROJECT_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+DB_PATH="$PROJECT_ROOT/data/app.db"
 
-cd "$PROJECT_ROOT"
+mkdir -p "$PROJECT_ROOT/data"
 
-mkdir -p pgdata pgsocket
+sqlite3 "$DB_PATH" < "$PROJECT_ROOT/sql/schema.sql"
+sqlite3 "$DB_PATH" < "$PROJECT_ROOT/sql/seed.sql"
 
-# initialize only if not already initialized
-if [ ! -f "pgdata/PG_VERSION" ]; then
-  initdb -D "$PROJECT_ROOT/pgdata"
-  echo "Initialized Postgres cluster at $PROJECT_ROOT/pgdata"
-else
-  echo "Postgres cluster already initialized"
-fi
+echo "SQLite database ready at: $DB_PATH"

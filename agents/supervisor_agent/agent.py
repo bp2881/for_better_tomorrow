@@ -25,5 +25,5 @@ Do NOT directly persist anything to the DB. The backend will take profile_valida
 supervisor_agent = Agent(
     name="supervisor_agent",
     model="gemini-2.5-flash-lite",
-    instruction=INSTRUCTION
+    instruction=INSTRUCTION,
 )
