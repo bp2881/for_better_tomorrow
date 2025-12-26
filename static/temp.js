@@ -203,49 +203,43 @@ function getDayLabel(day) {
 
 function showDay(day) {
     currentDay = day;
-
     document.getElementById('daySelectionPage').classList.remove('active');
     document.getElementById('planPage').classList.add('active');
     document.getElementById('dayTitle').textContent = `Day ${day} - Week ${currentWeek}`;
 
-    const workoutDay = userData.plannerOutput.workout.find(d => d.day === day);
-    const dietDay = userData.plannerOutput.diet.find(d => d.day === day);
+    fetchDayPlan(day);
+}
+async function fetchDayPlan(day) {
+    const dayPlan = userData.plannerOutput.days.find(d => d.day === day);
 
-    if (!workoutDay || !dietDay) {
+    if (!dayPlan) {
         alert("No plan found for this day");
         return;
     }
 
-    console.log("Workout:", workoutDay);
-    console.log("Diet:", dietDay);
-
-    renderWorkout(workoutDay.exercises);
-    renderDiet(dietDay.meals);
-    updateStatsFromPlan(workoutDay);
+    renderWorkout(dayPlan.workout);
+    renderDiet(dayPlan.diet);
+    updateStatsFromPlan(dayPlan);
 }
-
 
 function renderWorkout(exercises) {
     const workoutList = document.getElementById('workoutList');
     workoutList.innerHTML = '';
 
     exercises.forEach((exercise, index) => {
-        const seconds = exercise.duration_seconds || 60;
-        const duration = `${Math.round(seconds / 60)} min`;
-
         const card = document.createElement('div');
         card.className = 'workout-card';
         card.innerHTML = `
             <div class="exercise-header">
                 <div class="exercise-name">${exercise.name}</div>
-                <div class="exercise-duration">${duration}</div>
+                <div class="exercise-duration">${exercise.duration}</div>
             </div>
-            <div class="exercise-details">${exercise.description || ''}</div>
-            <div class="timer-display" id="timer-${index}">${duration}</div>
+            <div class="exercise-details">${exercise.description}</div>
+            <div class="timer-display" id="timer-${index}">${exercise.duration}</div>
             <div class="timer-controls">
-                <button onclick="startTimer(${index})">Start</button>
+                <button onclick="startTimer(${index}, ${exercise.seconds})">Start</button>
                 <button onclick="pauseTimer(${index})">Pause</button>
-                <button onclick="resetTimer(${index}, '${duration}')">Reset</button>
+                <button onclick="resetTimer(${index}, '${exercise.duration}')">Reset</button>
             </div>
             <div class="progress-bar">
                 <div class="progress-fill" id="progress-${index}"></div>
@@ -253,6 +247,68 @@ function renderWorkout(exercises) {
         `;
         workoutList.appendChild(card);
     });
+}
+
+
+function getExercises(day) {
+    const hasEquipment = userData.equipment.length > 0 && !userData.equipment.includes('none');
+    const duration = userData.duration || 60;
+    const dayMod = day % 7;
+    let allExercises = [];
+    
+    // Warmup
+    allExercises.push(
+        { name: 'Jumping Jacks', duration: '2:00', seconds: 120, description: 'Full body cardio warm-up', type: 'warmup' },
+        { name: 'Arm Circles', duration: '1:00', seconds: 60, description: 'Shoulder mobility', type: 'warmup' },
+        { name: 'Dynamic Stretches', duration: '2:00', seconds: 120, description: 'Prepare muscles', type: 'warmup' }
+    );
+    
+    if (dayMod === 1 || dayMod === 4) { // Upper body
+        if (hasEquipment && userData.equipment.includes('dumbbells')) {
+            allExercises.push(
+                { name: 'Dumbbell Chest Press', duration: '3:00', seconds: 180, description: '4 sets of 10 reps', type: 'strength' },
+                { name: 'Dumbbell Rows', duration: '3:00', seconds: 180, description: '4 sets of 12 reps', type: 'strength' },
+                { name: 'Dumbbell Shoulder Press', duration: '2:30', seconds: 150, description: '3 sets of 10 reps', type: 'strength' }
+            );
+        } else {
+            allExercises.push(
+                { name: 'Push-ups', duration: '2:30', seconds: 150, description: '4 sets to failure', type: 'strength' },
+                { name: 'Pike Push-ups', duration: '2:00', seconds: 120, description: '3 sets of 12 reps', type: 'strength' },
+                { name: 'Tricep Dips', duration: '2:00', seconds: 120, description: '3 sets of 15 reps', type: 'strength' }
+            );
+        }
+    } else if (dayMod === 2 || dayMod === 5) { // Lower body
+        allExercises.push(
+            { name: 'Bodyweight Squats', duration: '3:00', seconds: 180, description: '4 sets of 20 reps', type: 'strength' },
+            { name: 'Lunges', duration: '3:00', seconds: 180, description: '3 sets of 15 each leg', type: 'strength' },
+            { name: 'Jump Squats', duration: '2:00', seconds: 120, description: 'Explosive leg power', type: 'cardio' }
+        );
+    } else if (dayMod === 3 || dayMod === 6) { // Cardio
+        allExercises.push(
+            { name: 'High Knees', duration: '2:00', seconds: 120, description: 'Cardiovascular endurance', type: 'cardio' },
+            { name: 'Mountain Climbers', duration: '2:00', seconds: 120, description: 'Core and cardio', type: 'cardio' },
+            { name: 'Burpees', duration: '2:30', seconds: 150, description: 'Full body HIIT', type: 'cardio' }
+        );
+    } else { // Rest/Recovery
+        allExercises.push(
+            { name: 'Yoga Flow', duration: '4:00', seconds: 240, description: 'Sun salutations', type: 'flexibility' },
+            { name: 'Hip Openers', duration: '3:00', seconds: 180, description: 'Pigeon pose variations', type: 'flexibility' }
+        );
+    }
+    
+    if (dayMod !== 0) {
+        allExercises.push(
+            { name: 'Plank Hold', duration: '2:00', seconds: 120, description: '4 sets of 30 seconds', type: 'core' },
+            { name: 'Russian Twists', duration: '2:00', seconds: 120, description: '3 sets of 20 reps', type: 'core' }
+        );
+    }
+    
+    allExercises.push(
+        { name: 'Walking Recovery', duration: '2:00', seconds: 120, description: 'Lower heart rate', type: 'cooldown' },
+        { name: 'Full Body Stretch', duration: '3:00', seconds: 180, description: 'Hold each stretch', type: 'cooldown' }
+    );
+    
+    return allExercises;
 }
 
 function renderDiet(meals) {
@@ -279,12 +335,8 @@ function renderDiet(meals) {
 
 
 function updateStatsFromPlan(plan) {
-    const totalSeconds = plan.exercises.reduce(
-        (s, e) => s + (e.duration_seconds || 60),
-        0
-    );
-
-    document.getElementById('totalExercises').textContent = plan.exercises.length;
+    const totalSeconds = plan.workout.reduce((s, e) => s + e.seconds, 0);
+    document.getElementById('totalExercises').textContent = plan.workout.length;
     document.getElementById('totalDuration').textContent = Math.round(totalSeconds / 60);
 
     const bmr = 10 * userData.weight + 6.25 * userData.height - 5 * userData.age + 5;
@@ -324,10 +376,7 @@ function calculateStreak() {
 function completeDay() {
     if (!progressData.completedDays.includes(currentDay)) {
         progressData.completedDays.push(currentDay);
-        const workoutDay = userData.plannerOutput.workout.find(d => d.day === currentDay);
-        if (workoutDay) {
-            progressData.totalWorkouts += workoutDay.exercises.length;
-        }
+        progressData.totalWorkouts += getExercises(currentDay).length;
         saveProgress();
         alert(`Congratulations! Day ${currentDay} completed!`);
         goToDaySelection();
@@ -376,40 +425,37 @@ function closeProfile() {
     document.getElementById('profileModal').classList.remove('active');
 }
 
-function startTimer(index) {
+function startTimer(index, durationStr) {
     if (currentTimers[index]) clearInterval(currentTimers[index].interval);
-
-    const workoutDay = userData.plannerOutput.workout.find(d => d.day === currentDay);
-    if (!workoutDay) return;
-
-    const exercises = workoutDay.exercises;
-
-    const totalSeconds = exercises[index].duration_seconds || 60;
+    
+    const exercises = getExercises(currentDay);
+    const totalSeconds = exercises[index].seconds;
     let remainingSeconds = currentTimers[index]?.remaining || totalSeconds;
-
+    
     currentTimers[index] = {
         interval: setInterval(() => {
             remainingSeconds--;
             const minutes = Math.floor(remainingSeconds / 60);
             const seconds = remainingSeconds % 60;
-
-            document.getElementById(`timer-${index}`).textContent =
-                `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
+            document.getElementById(`timer-${index}`).textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
             const progress = ((totalSeconds - remainingSeconds) / totalSeconds) * 100;
             document.getElementById(`progress-${index}`).style.width = `${progress}%`;
-
+            
             if (remainingSeconds <= 0) {
                 clearInterval(currentTimers[index].interval);
                 delete currentTimers[index];
                 document.getElementById(`timer-${index}`).textContent = 'Complete!';
                 document.getElementById(`progress-${index}`).style.width = '100%';
+                completedExercises++;
+                if (completedExercises >= exercises.length) {
+                    showBreak();
+                }
             }
         }, 1000),
         remaining: remainingSeconds
     };
 }
-
 
 function pauseTimer(index) {
     if (currentTimers[index]) {

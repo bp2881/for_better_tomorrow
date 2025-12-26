@@ -1,9 +1,9 @@
--- sql/schema.sql
+-- sql/sqlschema.sql
 PRAGMA foreign_keys = ON;
 
 -- Users
 CREATE TABLE IF NOT EXISTS users (
-  id TEXT PRIMARY KEY,            -- UUID as text
+  id TEXT PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
   email TEXT UNIQUE,
   age INTEGER,
@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS programs (
   name TEXT NOT NULL,
   duration_weeks INTEGER DEFAULT 4,
   daily_ex_minutes INTEGER DEFAULT 30,
-  equipment TEXT DEFAULT '[]',     -- JSON string
-  goals TEXT DEFAULT '[]',
+  equipment TEXT DEFAULT '[]', -- JSON string
+  goals TEXT DEFAULT '[]',     -- JSON string
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS exercises (
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
--- Day → Exercises mapping
+-- Day -> Exercises mapping
 CREATE TABLE IF NOT EXISTS day_exercises (
   id TEXT PRIMARY KEY,
   day_id TEXT NOT NULL,
@@ -74,6 +74,8 @@ CREATE TABLE IF NOT EXISTS day_exercises (
   FOREIGN KEY (day_id) REFERENCES days(id) ON DELETE CASCADE,
   FOREIGN KEY (exercise_id) REFERENCES exercises(id)
 );
+
+CREATE INDEX IF NOT EXISTS idx_dayex_day_order ON day_exercises(day_id, exercise_order);
 
 -- Progress snapshots
 CREATE TABLE IF NOT EXISTS progress_snapshots (
@@ -89,16 +91,36 @@ CREATE TABLE IF NOT EXISTS progress_snapshots (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Agents (model NOT stored; default handled in code)
+-- Agents
 CREATE TABLE IF NOT EXISTS agents (
   id TEXT PRIMARY KEY,
   name TEXT UNIQUE NOT NULL,
   role TEXT,
   description TEXT,
-  config TEXT DEFAULT '{}',
+  config TEXT DEFAULT '{}', -- JSON string for overrides; default model is in code
   active INTEGER DEFAULT 1,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Agent runs (history)
+CREATE TABLE IF NOT EXISTS agent_runs (
+  id TEXT PRIMARY KEY,
+  agent_id TEXT NOT NULL,
+  user_id TEXT,
+  input TEXT,
+  output TEXT,
+  status TEXT NOT NULL DEFAULT 'pending',
+  error TEXT,
+  started_at TEXT,
+  finished_at TEXT,
+  metadata TEXT DEFAULT '{}',
+  FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_agent_runs_agent ON agent_runs(agent_id);
+CREATE INDEX IF NOT EXISTS idx_agent_runs_user ON agent_runs(user_id);
+CREATE INDEX IF NOT EXISTS idx_agent_runs_status ON agent_runs(status);
 
 -- UI templates
 CREATE TABLE IF NOT EXISTS ui_templates (
