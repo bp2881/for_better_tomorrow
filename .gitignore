@@ -6,3 +6,7 @@ temp_agent/__pycache__/
 .adk/
 temp_agent/temp_agent/
 temp_agent/.adk/
+venv/
+
+database/pgdata/
+database/pgsocket/
