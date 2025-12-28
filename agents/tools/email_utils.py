@@ -21,4 +21,3 @@ def send_email(to_email, subject, body):
         server.starttls()
         server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
         server.send_message(msg)
-send_email("ghantakowshikkumar@gmail.com", "Test Subject", "This is a test email body.")

@@ -1,5 +1,5 @@
 from init_db import get_db
-from email_utils import send_email
+from agents.tools.email_utils import send_email
 from time import sleep
 
 def send_motivational_emails():

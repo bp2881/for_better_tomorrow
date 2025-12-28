@@ -6,7 +6,7 @@ from init_db import init_db, get_db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
-from motivational import send_motivational_emails
+from agents.tools.motivational import send_motivational_emails
 import threading
 app = Flask(__name__)
 CORS(app)
