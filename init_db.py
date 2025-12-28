@@ -1,6 +1,6 @@
 import sqlite3
 
-DB_PATH = "health.db"
+DB_PATH = "./database/health.db"
 
 def get_db():
     return sqlite3.connect(DB_PATH, check_same_thread=False)

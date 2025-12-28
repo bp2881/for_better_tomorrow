@@ -28,7 +28,7 @@ You’re building a future you’ll thank yourself for.
 """
             send_email(
                 to_email=email,
-                subject="🔥 Small steps today = Big results tomorrow",
+                subject="Small steps today = Big results tomorrow",
                 body=body
             )
         sleep(600)
