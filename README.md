@@ -33,8 +33,7 @@ A project dedicated to building a better future for individuals through healthca
 Ensure you have the following installed on your system:
 
 -   Python **3.13 or higher**
--   Git
--   (Optional) Node.js & npm if a frontend exists
+-   Linux (Preffered) or Windows
 
 ---
 
