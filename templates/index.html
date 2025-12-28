@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Health Planner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+
+    
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    
+    <button class="profile-btn" type="button" onclick="showProfile()" style="display: none;" id="profileBtn">📊</button>
+    
+    <!-- User Details Page -->
+    <div id="userDetailsPage" class="page active">
+        <div class="container">
+            <h1>Agentic Health Planner</h1>
+            <p class="subtitle">Transform your fitness journey with AI-powered personalized plans</p>
+            
+            <div class="form-section" style="animation-delay: 0.1s;">
+                <h2 class="section-title">User Details</h2>
+                <div class="input-group">
+                    <div class="input-field">
+                        <label>Age</label>
+                        <input type="number" id="age" placeholder="20" min="10" max="100">
+                    </div>
+                    <div class="input-field">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="weight" placeholder="100" min="30" max="200">
+                    </div>
+                    <div class="input-field">
+                        <label>Height (cm)</label>
+                        <input type="number" id="height" placeholder="188" min="100" max="250">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section" style="animation-delay: 0.2s;">
+                <h2 class="section-title">Daily Exercise Time</h2>
+                <div class="button-group" id="durationGroup">
+                    <button class="option-btn" type="button" data-value="30">30 Minutes</button>
+                    <button class="option-btn active" type="button" data-value="60">60 Minutes</button>
+                    <button class="option-btn" type="button" data-value="90">90 Minutes</button>
+                </div>
+            </div>
+            
+            <div class="form-section" style="animation-delay: 0.25s;">
+                <h2 class="section-title">Program Duration</h2>
+                <div class="button-group" id="programDurationGroup">
+                    <button class="option-btn" type="button" data-value="7">1 Week</button>
+                    <button class="option-btn active" type="button" data-value="30">1 Month</button>
+                    <button class="option-btn" type="button" data-value="90">3 Months</button>
+                    <button class="option-btn" type="button" data-value="180">6 Months</button>
+                </div>
+            </div>
+            
+            <div class="form-section" style="animation-delay: 0.3s;">
+                <h2 class="section-title">Equipment Available</h2>
+                <div class="button-group" id="equipmentGroup">
+                    <button class="option-btn" type="button" data-value="none">No Equipment</button>
+                    <button class="option-btn" type="button" data-value="dumbbells">Dumbbells</button>
+                    <button class="option-btn" type="button" data-value="bands">Resistance Bands</button>
+                    <button class="option-btn" type="button" data-value="yoga">Yoga Mat</button>
+                </div>
+            </div>
+            
+            <div class="form-section" style="animation-delay: 0.4s;">
+                <h2 class="section-title">Primary Goals</h2>
+                <div class="button-group" id="goalsGroup">
+                    <button class="option-btn" type="button" data-value="fat-loss">Fat Loss</button>
+                    <button class="option-btn" type="button" data-value="muscle">Muscle Gain</button>
+                    <button class="option-btn" type="button" data-value="endurance">Endurance</button>
+                    <button class="option-btn" type="button" data-value="flexibility">Flexibility</button>
+                    <button class="option-btn" type="button" data-value="general">General Fitness</button>
+                </div>
+            </div>
+            
+            <button class="generate-btn" type="button" onclick="generatePlan()">Generate My Plan</button>
+        </div>
+    </div>
+    
+    <!-- Week Selection Page -->
+    <div id="weekSelectionPage" class="page">
+        <div class="container">
+            <button class="back-btn" type="button" onclick="goToUserDetails()">← Back to Settings</button>
+            <h1>Select Week</h1>
+            <p class="subtitle" id="programSummary"></p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalDays">0</div>
+                    <div class="stat-label">Total Days</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="completedDays">0</div>
+                    <div class="stat-label">Days Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="streakDays">0</div>
+                    <div class="stat-label">Current Streak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="percentComplete">0</div>
+                    <div class="stat-label">Progress</div>
+                </div>
+            </div>
+            <div id="weekGrid" class="week-grid"></div>
+        </div>
+    </div>
+    
+    <!-- Day Selection Page -->
+    <div id="daySelectionPage" class="page">
+        <div class="container">
+            <button class="back-btn" type="button" onclick="goToWeekSelection()">← Back to Weeks</button>
+            <h1 id="weekTitle">Week 1</h1>
+            <p class="subtitle">Select a day to view your workout and diet plan</p>
+            <div id="dayGrid" class="week-grid"></div>
+        </div>
+    </div>
+    
+    <!-- Daily Plan Page -->
+    <div id="planPage" class="page">
+        <div class="container">
+            <button class="back-btn" type="button" onclick="goToDaySelection()">← Back to Days</button>
+            <h1 id="dayTitle">Day 1</h1>
+            <p class="subtitle" id="userSummary"></p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalExercises">0</div>
+                    <div class="stat-label">Exercises</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalDuration">0</div>
+                    <div class="stat-label">Minutes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="calorieTarget">0</div>
+                    <div class="stat-label">Calories Target</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="proteinTarget">0g</div>
+                    <div class="stat-label">Protein</div>
+                </div>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('workout')">Workout</div>
+                <div class="tab" onclick="switchTab('diet')">Diet</div>
+            </div>
+            
+            <div id="workoutTab" class="tab-content active">
+                <div id="workoutList"></div>
+            </div>
+            <div id="dietTab" class="tab-content">
+                <div id="dietList"></div>
+            </div>
+            
+            <button class="complete-day-btn" type="button" onclick="completeDay()">Mark Day as Complete</button>
+        </div>
+    </div>
+    
+    <!-- Profile Modal -->
+    <div class="profile-modal" id="profileModal">
+        <div class="profile-content">
+            <span class="close-btn" onclick="closeProfile()">&times;</span>
+            <h2 style="font-family: 'Syne', sans-serif; margin-bottom: 2rem;">Your Progress</h2>
+            <div class="progress-stat">
+                <span class="progress-label">Total Days</span>
+                <span class="progress-value" id="modalTotalDays">0</span>
+            </div>
+            <div class="progress-stat">
+                <span class="progress-label">Days Completed</span>
+                <span class="progress-value" id="modalCompletedDays">0</span>
+            </div>
+            <div class="progress-stat">
+                <span class="progress-label">Current Streak</span>
+                <span class="progress-value" id="modalStreak">0</span>
+            </div>
+            <div class="progress-stat">
+                <span class="progress-label">Total Workouts</span>
+                <span class="progress-value" id="modalWorkouts">0</span>
+            </div>
+            <div class="progress-stat">
+                <span class="progress-label">Completion Rate</span>
+                <span class="progress-value" id="modalCompletion">0</span>
+            </div>
+            <div class="progress-stat">
+                <span class="progress-label">Estimated Calories Burned</span>
+                <span class="progress-value" id="modalCalories">0</span>
+            </div>
+            <div style="margin-top: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Weekly Progress</h3>
+                <div id="weeklyProgress"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Break Overlay -->
+    <div class="break-overlay" id="breakOverlay">
+        <div class="break-content">
+            <h2 style="font-family: 'Syne', sans-serif; font-size: 3rem;">Break Time!</h2>
+            <div class="break-timer" id="breakTimer">15</div>
+            <p style="font-size: 1.2rem; color: var(--text-secondary);">Rest and prepare for your next exercise</p>
+        </div>
+    </div>
+
+   <script src="{{ url_for('static', filename='index.js') }}"></script>
+
+</body>
+</html>

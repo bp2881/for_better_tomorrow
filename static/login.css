@@ -1,0 +1,203 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 50%, #16213e 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-container {
+    background: rgba(20, 24, 36, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(31, 38, 55, 0.5);
+    border-radius: 24px;
+    padding: 3rem 2.5rem;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+    position: relative;
+}
+
+.tab-switcher {
+    display: flex;
+    background: rgba(10, 14, 26, 0.8);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 0.8rem 1rem;
+    border: none;
+    background: none;
+    color: #8b92b0;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.tab-btn.active {
+    background: #00ff88;
+    color: #0a0e1a;
+    font-weight: 700;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.login-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #00ff88 0%, #4d7cfe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    font-family: 'Syne', sans-serif;
+}
+
+.login-subtitle {
+    color: #8b92b0;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.input-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-field label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+    font-size: 0.95rem;
+}
+
+.input-field input {
+    background: rgba(10, 14, 26, 0.8);
+    border: 2px solid rgba(31, 38, 55, 0.5);
+    border-radius: 12px;
+    padding: 1rem;
+    color: #ffffff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.input-field input:focus {
+    outline: none;
+    border-color: #00ff88;
+    box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.2);
+}
+
+.input-field input::placeholder {
+    color: #8b92b0;
+}
+
+.login-btn, .create-btn {
+    width: 100%;
+    padding: 1.2rem;
+    border: none;
+    border-radius: 16px;
+    color: #0a0e1a;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Syne', sans-serif;
+    margin-bottom: 1rem;
+}
+
+.login-btn {
+    background: linear-gradient(135deg, #00ff88 0%, #00dd77 100%);
+}
+
+.create-btn {
+    background: linear-gradient(135deg, #4d7cfe 0%, #b84dfe 100%);
+}
+
+.login-btn:hover, .create-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 50px rgba(0, 255, 136, 0.4);
+}
+
+.create-btn:hover {
+    box-shadow: 0 20px 50px rgba(77, 124, 254, 0.4);
+}
+
+.error {
+    background: rgba(255, 68, 68, 0.2);
+    border: 2px solid #ff4444;
+    color: #ff4444;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-top: 1rem;
+    font-weight: 500;
+    animation: shake 0.5s ease-in-out;
+    display: none;
+}
+
+.success {
+    background: rgba(0, 255, 136, 0.2);
+    border: 2px solid #00ff88;
+    color: #00ff88;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-top: 1rem;
+    font-weight: 500;
+    display: none;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.switch-link {
+    text-align: center;
+    color: #8b92b0;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+.switch-link span {
+    color: #00ff88;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+@media (max-width: 480px) {
+    .login-container {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+    }
+    
+    .login-title {
+    font-size: 2rem;
+    }
+}
