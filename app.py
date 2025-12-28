@@ -119,9 +119,9 @@ def generate_plan():
         return jsonify({"error": "Missing userData"}), 400
 
     payload = {
-        "app_name": "agents",   # MUST match folder name passed to `adk web`
+        "app_name": "agents",  
         "user_id": "user",
-        "session_id": "604ee1c7-4584-44db-a1a1-82e190a4d1e5",
+        "session_id": "8cb4a89f-d3ee-4ffa-ba6f-febd2d7a0327",
         "new_message": {
             "role": "user",
             "parts": [{
@@ -186,6 +186,7 @@ def generate_plan():
                 "error": "Agent did not return ui_plan",
                 "raw": response_json
             }), 500
+    
         cursor.execute("""
             INSERT INTO plans (user_id, plan_json, created_at)
             VALUES (?, ?, ?)

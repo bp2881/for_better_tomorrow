@@ -98,7 +98,6 @@ async function generatePlan() {
 
     loadProgress();
 
-    // 🔥 THIS WAS MISSING
     const userId = localStorage.getItem("user_id");
 
     if (!userId) {
@@ -112,7 +111,7 @@ async function generatePlan() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                user_id: userId,        // ✅ REQUIRED
+                user_id: userId,        
                 userData: userData,
                 progressData: progressData
             })

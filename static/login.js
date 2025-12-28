@@ -63,7 +63,7 @@ registerForm.addEventListener('submit', async (e) => {
     return;
   }
 
-  registerSuccess.textContent = "✅ Account created successfully";
+  registerSuccess.textContent = "Account created successfully";
   registerSuccess.style.display = 'block';
   setTimeout(() => switchTab('login'), 1500);
 });
