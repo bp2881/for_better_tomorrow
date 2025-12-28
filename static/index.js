@@ -1,7 +1,7 @@
 let userData = {
     age: 20, weight: 100, height: 188,
     duration: 60, programDays: 30,
-    equipment: [], goals: [],
+    equipment: [], goals: [], preferences: [],
     startDate: new Date()
 };
 
@@ -80,12 +80,19 @@ document.querySelectorAll('#equipmentGroup .option-btn').forEach(btn => {
     });
 });
 
+document.querySelectorAll('#preferencesGroup .option-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        UIState.setSingle('preferencesGroup', btn);
+    });
+});
+
 async function generatePlan() {
     userData.age = parseInt(document.getElementById('age').value) || 20;
     userData.weight = parseInt(document.getElementById('weight').value) || 100;
     userData.height = parseInt(document.getElementById('height').value) || 188;
     userData.equipment = UIState.getActive('equipmentGroup');
     userData.goals = UIState.getActive('goalsGroup');
+    userData.preferences = UIState.getActive('preferencesGroup');
 
     if (userData.goals.length !== 1) {
         alert('Please select exactly one primary goal.');
@@ -95,7 +102,10 @@ async function generatePlan() {
         alert('Please select equipment.');
         return;
     }
-
+    if (userData.preferences.length === 0) {
+        alert('Please select food preferences.');
+        return;
+    }
     loadProgress();
 
     const userId = localStorage.getItem("user_id");

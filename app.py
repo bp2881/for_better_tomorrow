@@ -117,7 +117,7 @@ def generate_plan():
 
     if not user_data:
         return jsonify({"error": "Missing userData"}), 400
-
+    print("User Data:", user_data)
     payload = {
         "app_name": "agents",  
         "user_id": "user",
@@ -129,6 +129,7 @@ def generate_plan():
                     "Generate a complete fitness plan.\n\n"
                     f"User data:\n{json.dumps(user_data, indent=2)}\n\n"
                     f"Progress data:\n{json.dumps(progress_data, indent=2)}\n\n"
+                    f"Preferences: {json.dumps(user_data.get('preferences', []), indent=2)}\n\n"
                     "Return JSON only."
                 )
             }]
