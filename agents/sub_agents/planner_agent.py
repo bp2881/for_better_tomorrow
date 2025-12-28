@@ -10,6 +10,9 @@ Output (JSON only) with keys:
 Constraints:
 - Use user_memory['progress_snapshots'] and user_memory['user'] to adapt intensity.
 - Do NOT write to any DB.
+
+NEVER IGNORE PLAN 
+
 """
 
 planner_agent = Agent(

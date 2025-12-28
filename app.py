@@ -5,7 +5,7 @@ from flask_cors import CORS, cross_origin
 from init_db import init_db, get_db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-from test import get_agent_url
+#from test import get_agent_url
 from agents.tools.motivational import send_motivational_emails
 import threading
 import uuid
@@ -14,11 +14,20 @@ app = Flask(__name__)
 CORS(app)
 init_db()
 
-def worker():
+'''def worker():
     global session_result
-    session_result = get_agent_url()
+    session_result = get_agent_url()'''
 
-ADK_URL = "http://localhost:8000/run"
+def sessionid():
+    return str(uuid.uuid4())
+def adkurl(user_id):
+    session_id = sessionid()
+    ADK_URL = (
+        f"http://localhost:8000/apps/agents"
+        f"/users/{user_id}"
+        f"/sessions/{session_id}:run"
+    )
+    return ADK_URL, session_id
 
 @app.route("/")
 def index():
@@ -91,6 +100,7 @@ def generate_plan():
     user_id = data.get("user_id")
     user_data = data.get("userData")
     progress_data = data.get("progressData", {})
+    ADK_URL,session_id = adkurl(user_id)
 
     if not user_id or not user_data:
         return jsonify({"error": "Missing data"}), 400
@@ -126,13 +136,10 @@ def generate_plan():
         return jsonify({"error": "Missing userData"}), 400
     print("User Data:", user_data)
 
-    if session_result is None:
-        raise "hello"
-
     payload = {
         "app_name": "agents",  
         "user_id": "user",
-        "session_id": "a1c61810-5828-43d5-9d60-889564c0c0dd",
+        "session_id": f"{session_id}",
         "new_message": {
             "role": "user",
             "parts": [{
@@ -157,7 +164,7 @@ def generate_plan():
         response.raise_for_status()
 
         response_json = response.json()
-
+        print("ADK Response JSON:", response_json)
         # ADK returns a LIST of events
         if isinstance(response_json, list):
             events = response_json
@@ -165,7 +172,7 @@ def generate_plan():
             events = response_json.get("events", [])
         else:
             events = []
-
+        print("ADK Response Events:", events)
         ui_plan = None
 
         for event in events:
@@ -192,8 +199,9 @@ def generate_plan():
 
             if ui_plan:
                 break
-
+        print("UI Plan:", ui_plan)
         if not ui_plan:
+            conn.close()
             return jsonify({
                 "error": "Agent did not return ui_plan",
                 "raw": response_json
@@ -221,9 +229,6 @@ def generate_plan():
 
 
 if __name__ == "__main__":
-    thread = threading.Thread(target=worker)
-    thread.start()
-    thread.join()
     email_thread = threading.Thread(
         target=send_motivational_emails,
         daemon=True
