@@ -8,6 +8,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 from agents.tools.motivational import send_motivational_emails
 import threading
+import uuid
+
 app = Flask(__name__)
 CORS(app)
 init_db()
@@ -119,10 +121,11 @@ def generate_plan():
     if not user_data:
         return jsonify({"error": "Missing userData"}), 400
     print("User Data:", user_data)
+
     payload = {
         "app_name": "agents",  
         "user_id": "user",
-        "session_id": "8cb4a89f-d3ee-4ffa-ba6f-febd2d7a0327",
+        "session_id": "5deff615-0ff8-424e-8955-0115fe4f9fd2",
         "new_message": {
             "role": "user",
             "parts": [{
