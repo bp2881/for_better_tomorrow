@@ -5,7 +5,7 @@ from flask_cors import CORS, cross_origin
 from init_db import init_db, get_db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-import uuid
+from test import get_agent_url
 from agents.tools.motivational import send_motivational_emails
 import threading
 import uuid
@@ -13,6 +13,10 @@ import uuid
 app = Flask(__name__)
 CORS(app)
 init_db()
+
+def worker():
+    global session_result
+    session_result = get_agent_url()
 
 ADK_URL = "http://localhost:8000/run"
 
@@ -122,10 +126,13 @@ def generate_plan():
         return jsonify({"error": "Missing userData"}), 400
     print("User Data:", user_data)
 
+    if session_result is None:
+        raise "hello"
+
     payload = {
         "app_name": "agents",  
         "user_id": "user",
-        "session_id": "5deff615-0ff8-424e-8955-0115fe4f9fd2",
+        "session_id": "a1c61810-5828-43d5-9d60-889564c0c0dd",
         "new_message": {
             "role": "user",
             "parts": [{
@@ -214,6 +221,9 @@ def generate_plan():
 
 
 if __name__ == "__main__":
+    thread = threading.Thread(target=worker)
+    thread.start()
+    thread.join()
     email_thread = threading.Thread(
         target=send_motivational_emails,
         daemon=True
@@ -225,3 +235,4 @@ if __name__ == "__main__":
         port=5001,
         use_reloader=False
     )
+

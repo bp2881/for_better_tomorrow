@@ -5,11 +5,18 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from urllib.parse import urlparse, parse_qs
 
 
 def get_agent_url():
     options = Options()
-    options.add_argument("--start-maximized")
+
+    # 🔒 Run Chrome in background (headless)
+    options.add_argument("--headless=new")  # use "--headless" if older Chrome
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--window-size=1920,1080")
 
     driver = webdriver.Chrome(
         service=Service(ChromeDriverManager().install()),
@@ -44,12 +51,12 @@ def get_agent_url():
         wait.until(lambda d: "session" in d.current_url)
 
         # 5️⃣ Capture final URL
-        return driver.current_url
+        good_url = driver.current_url
+        parsed_url = urlparse(good_url)
+        query_params = parse_qs(parsed_url.query)
+
+        session = query_params.get("session", [None])[0]
+        return session
 
     finally:
         driver.quit()
-
-
-if __name__ == "__main__":
-    url = get_agent_url()
-    print("Agent URL:", url)
