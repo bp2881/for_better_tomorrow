@@ -4,26 +4,17 @@ import json
 from flask_cors import CORS, cross_origin
 from init_db import init_db, get_db
 from datetime import datetime
-<<<<<<< HEAD
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 
 app = Flask(__name__)
 CORS(app)
 init_db()
-=======
-import uuid
-
-app = Flask(__name__)
-init_db()
-CORS(app, support_credentials=True)
->>>>>>> fbf0f574421055968a69aea1b4777bfc9e3afdba
 
 ADK_URL = "http://localhost:8000/run"
 
 @app.route("/")
 def index():
-<<<<<<< HEAD
     return render_template("login.html")
 
 @app.route("/api/register", methods=["POST"])
@@ -83,14 +74,11 @@ def login():
 
 @app.route("/home")
 def home():
-=======
->>>>>>> fbf0f574421055968a69aea1b4777bfc9e3afdba
     return render_template("index.html")
 
 @app.route("/generate_plan", methods=["POST"])
 @cross_origin(supports_credentials=True)
 def generate_plan():
-<<<<<<< HEAD
     data = request.get_json()
 
     user_id = data.get("user_id")
@@ -115,22 +103,6 @@ def generate_plan():
             start_date = ?
         WHERE id = ?
     """, (
-=======
-    data = request.json or {}
-    user_data = data.get("userData", {})
-    progress_data = data.get("progressData", {})
-
-    conn = get_db()
-    cursor = conn.cursor()
-
-    user_id = user_data.get("id") or str(uuid.uuid4())
-    cursor.execute("""
-        INSERT OR IGNORE INTO users
-        (id, age, weight, height, program_days, goals, equipment, start_date, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-        user_id,
->>>>>>> fbf0f574421055968a69aea1b4777bfc9e3afdba
         user_data.get("age"),
         user_data.get("weight"),
         user_data.get("height"),
@@ -138,17 +110,11 @@ def generate_plan():
         ",".join(user_data.get("goals", [])),
         ",".join(user_data.get("equipment", [])),
         user_data.get("startDate"),
-<<<<<<< HEAD
         user_id
     ))
 
     conn.commit()
 
-=======
-        datetime.utcnow().isoformat()
-    ))
-
->>>>>>> fbf0f574421055968a69aea1b4777bfc9e3afdba
     if not user_data:
         return jsonify({"error": "Missing userData"}), 400
 
