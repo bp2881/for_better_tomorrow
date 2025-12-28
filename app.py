@@ -216,7 +216,7 @@ if __name__ == "__main__":
         daemon=True
     )
     email_thread.start()
-    
+
     app.run(
         debug=True,
         port=5001,
