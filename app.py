@@ -6,7 +6,8 @@ from init_db import init_db, get_db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
-
+from motivational import send_motivational_emails
+import threading
 app = Flask(__name__)
 CORS(app)
 init_db()
@@ -210,6 +211,12 @@ def generate_plan():
 
 
 if __name__ == "__main__":
+    email_thread = threading.Thread(
+        target=send_motivational_emails,
+        daemon=True
+    )
+    email_thread.start()
+    
     app.run(
         debug=True,
         port=5001,
