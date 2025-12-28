@@ -98,6 +98,7 @@ async function generatePlan() {
 
     loadProgress();
 
+<<<<<<< HEAD
     // 🔥 THIS WAS MISSING
     const userId = localStorage.getItem("user_id");
 
@@ -126,6 +127,24 @@ async function generatePlan() {
         }
 
         // Save planner output
+=======
+    try {
+        const res = await fetch("/generate_plan", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ userData, progressData })
+        });
+        const data = await res.json();
+
+        if (data.error) {
+            alert("Planner agent error: " + data.error);
+            return;
+        }
+        // 🔐 Persist backend identity
+        userData.id = data.user_id;
+
+        // Save planner output for later use
+>>>>>>> fbf0f574421055968a69aea1b4777bfc9e3afdba
         userData.plannerOutput = data.plan;
 
         // Move UI to week selection page
